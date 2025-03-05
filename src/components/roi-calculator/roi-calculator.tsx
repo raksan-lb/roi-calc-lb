@@ -85,7 +85,7 @@ export class RoiCalculator {
           style={{
             marginBottom: showSlider ? '0.5rem' : '0',
             marginRight: showSlider ? '0' : '1rem',
-            width: showSlider ? 'auto' : '50%',
+            width: showSlider ? 'auto' : '90%',
           }}
         >
           {label}
