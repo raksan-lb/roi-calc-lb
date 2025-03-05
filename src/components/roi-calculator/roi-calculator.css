@@ -64,7 +64,7 @@ h1 {
 }
 
 .input-field label {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--text-dark);
 }
@@ -257,7 +257,7 @@ input[type='range']::-webkit-slider-thumb:active {
 }
 
 .result-label {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--text-dark);
 }
@@ -272,9 +272,9 @@ input[type='range']::-webkit-slider-thumb:active {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: white;
+  background-color: var(--primary-dark);
   border-radius: var(--border-radius);
-  padding: 1.3rem;
+  padding: 1.5rem;
   box-shadow: var(--shadow-md);
   margin-top: 2rem;
   border: 2px solid var(--primary-color);
@@ -283,13 +283,13 @@ input[type='range']::-webkit-slider-thumb:active {
 .roi-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-dark);
+  color: var(--primary-light);
 }
 
 .roi-value {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--primary-color);
+  color: var(--primary-light);
 }
 
 .cta-container {
