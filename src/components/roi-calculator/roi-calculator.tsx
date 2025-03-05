@@ -6,10 +6,10 @@ import { Component, State, h } from '@stencil/core';
   shadow: true,
 })
 export class RoiCalculator {
-  @State() costPerHour: number = 25;
-  @State() ticketsPerMonth: number = 1000;
-  @State() timePerTicket: number = 20;
-  @State() aiResolutionRate: number = 50;
+  @State() costPerHour = 25;
+  @State() ticketsPerMonth = 1000;
+  @State() timePerTicket = 20;
+  @State() aiResolutionRate = 50;
 
   calculateSavings() {
     const askTimmyCost = 588;
@@ -57,30 +57,59 @@ export class RoiCalculator {
     slider.style.setProperty('--slider-fill', `${percentage}%`);
   }
 
-  renderInputField(label: string, field: 'costPerHour' | 'ticketsPerMonth' | 'timePerTicket' | 'aiResolutionRate', min: number, max: number, icon: string) {
+  renderSliderMarks(min: number, max: number) {
+    const quarter = Math.round(max / 4);
     return (
-      <div class="input-field">
-        <label htmlFor={field}>{label}</label>
-        <div class="input-container">
+      <div class="slider-marks">
+        <span>{min}</span>
+        <span>{quarter}</span>
+        <span>{quarter * 2}</span>
+        <span>{quarter * 3}</span>
+        <span>{max}</span>
+      </div>
+    );
+  }
+
+  renderInputField(label: string, field: 'costPerHour' | 'ticketsPerMonth' | 'timePerTicket' | 'aiResolutionRate', min: number, max: number, icon: string, showSlider = true) {
+    return (
+      <div
+        class="input-field"
+        style={{
+          display: 'flex',
+          flexDirection: showSlider ? 'column' : 'row',
+          alignItems: showSlider ? 'flex-start' : 'center',
+        }}
+      >
+        <label
+          htmlFor={field}
+          style={{
+            marginBottom: showSlider ? '0.5rem' : '0',
+            marginRight: showSlider ? '0' : '1rem',
+            width: showSlider ? 'auto' : '50%',
+          }}
+        >
+          {label}
+        </label>
+        <div class="input-container" style={{ flex: '0 0 auto', width: showSlider ? '100%' : '24%' }}>
           <div class="icon-wrapper">
             <span class={`input-icon ${icon}`}></span>
           </div>
-          <input id={field} type="number" value={this[field]} min={min} max={max} onInput={(event: Event) => this.handleSliderChange(field, event)} />
+          <input id={field} type="number" value={this[field]} min={min} max={max} onInput={(event: Event) => this.handleSliderChange(field, event)} style={{ width: '100%' }} />
         </div>
-        <div class="slider-container">
-          <input
-            type="range"
-            min={min}
-            max={max}
-            value={this[field]}
-            onInput={(event: Event) => this.handleSliderChange(field, event)}
-            style={{ '--slider-fill': `${((this[field] - min) / (max - min)) * 100}%` }}
-          />
-          <div class="slider-labels">
-            <span>{min}</span>
-            <span>{max}</span>
+        {showSlider && (
+          <div class="slider-container" style={{ width: '100%' }}>
+            <input
+              type="range"
+              min={min}
+              max={max}
+              value={this[field]}
+              aria-label={`${label} slider`}
+              onInput={(event: Event) => this.handleSliderChange(field, event)}
+              style={{ '--slider-fill': `${((this[field] - min) / (max - min)) * 100}%`, 'width': '100%' }}
+            />
+            {this.renderSliderMarks(min, max)}
           </div>
-        </div>
+        )}
       </div>
     );
   }
@@ -94,13 +123,13 @@ export class RoiCalculator {
 
         <div class="calculator-container">
           <div class="inputs-section">
-            {this.renderInputField('What is the cost per hour per agent? (in US$)', 'costPerHour', 1, 200, 'dollar-icon')}
+            {this.renderInputField('What is your cost per hour per agent? (in US$)', 'costPerHour', 1, 200, 'dollar-icon')}
 
             {this.renderInputField('How many tickets do you get each month?', 'ticketsPerMonth', 1, 2000, 'ticket-icon')}
 
             {this.renderInputField('Time it takes to resolve each ticket (in mins)', 'timePerTicket', 1, 200, 'clock-icon')}
 
-            {this.renderInputField('% of tickets you want AI to resolve automatically', 'aiResolutionRate', 1, 100, 'robot-icon')}
+            {this.renderInputField('% of tickets you want AI to resolve automatically', 'aiResolutionRate', 1, 100, 'robot-icon', false)}
           </div>
 
           <div class="results-section">
@@ -108,7 +137,7 @@ export class RoiCalculator {
               <div class="result-item">
                 <div class="result-icon conversations-icon"></div>
                 <div class="result-content">
-                  <div class="result-label">Total Conversations :</div>
+                  <div class="result-label">Total Conversations:</div>
                   <div class="result-value">{this.ticketsPerMonth * 12}/yr</div>
                 </div>
               </div>
@@ -150,12 +179,14 @@ export class RoiCalculator {
               <div class="roi-title">Annual ROI:</div>
               <div class="roi-value">{roi.toLocaleString(undefined, { maximumFractionDigits: 0 })}%</div>
             </div>
-            {/* 
-            <div class="cta-container">
-              <a href="https://apps.shopify.com/asktimmy-ai" class="cta-button" target="_blank" rel="noopener">
-                Try AskTimmy
+            <div class="button-group">
+              <a href="https://apps.shopify.com/asktimmy-ai?utm_source=asktimmy_home&amp;utm_medium=asktimmy_website" target="_blank" class="button-1 w-button">
+                Install the app
               </a>
-            </div> */}
+              <a href="https://zcal.co/cpsaravana/60min?utm_source=asktimmy_home&amp;utm_medium=asktimmy_website" target="_blank" class="button-1 white-btn w-button">
+                Book a demo
+              </a>
+            </div>
           </div>
         </div>
       </div>
