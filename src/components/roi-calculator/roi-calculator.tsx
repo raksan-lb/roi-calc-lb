@@ -12,7 +12,7 @@ export class RoiCalculator {
   @State() aiResolutionRate: number = 50;
 
   calculateSavings() {
-    const askTimmyCost = 948;
+    const askTimmyCost = 588;
 
     const hoursSavedPerMonth = this.ticketsPerMonth * (this.timePerTicket / 60) * (this.aiResolutionRate / 100);
     const hoursSavedPerYear = hoursSavedPerMonth * 12;
@@ -24,21 +24,63 @@ export class RoiCalculator {
 
   handleSliderChange(field: 'costPerHour' | 'ticketsPerMonth' | 'timePerTicket' | 'aiResolutionRate', event: Event) {
     const target = event.target as HTMLInputElement;
-    this[field] = Number(target.value);
+    let newValue = Number(target.value);
 
-    // Set the CSS variable for the slider background
-    // target.style.setProperty('--value', `${((Number(target.value) - Number(target.min)) / (Number(target.max) - Number(target.min))) * 100}%`);
+    // Define the min and max values for each field
+    const limits = {
+      costPerHour: { min: 1, max: 200 },
+      ticketsPerMonth: { min: 1, max: 2000 },
+      timePerTicket: { min: 1, max: 200 },
+      aiResolutionRate: { min: 1, max: 100 },
+    };
+
+    // Check if the new value exceeds the max limit
+    if (newValue > limits[field].max) {
+      newValue = limits[field].max; // Set to max if exceeded
+      target.value = newValue.toString(); // Update the input field
+    } else if (newValue < limits[field].min) {
+      newValue = limits[field].min; // Set to min if below
+      target.value = newValue.toString(); // Update the input field
+    }
+
+    this[field] = newValue;
+
+    // Update the slider fill
+    this.updateSliderFill(target);
   }
 
-  renderSliderMarks(min: number, max: number) {
-    const quarter = Math.round(max / 4);
+  updateSliderFill(slider: HTMLInputElement) {
+    const min = Number(slider.min) || 1;
+    const max = Number(slider.max) || 100;
+    const value = Number(slider.value);
+    const percentage = ((value - min) / (max - min)) * 100;
+    slider.style.setProperty('--slider-fill', `${percentage}%`);
+  }
+
+  renderInputField(label: string, field: 'costPerHour' | 'ticketsPerMonth' | 'timePerTicket' | 'aiResolutionRate', min: number, max: number, icon: string) {
     return (
-      <div class="slider-marks">
-        <span>{min}</span>
-        <span>{quarter}</span>
-        <span>{quarter * 2}</span>
-        <span>{quarter * 3}</span>
-        <span>{max}</span>
+      <div class="input-field">
+        <label htmlFor={field}>{label}</label>
+        <div class="input-container">
+          <div class="icon-wrapper">
+            <span class={`input-icon ${icon}`}></span>
+          </div>
+          <input id={field} type="number" value={this[field]} min={min} max={max} onInput={(event: Event) => this.handleSliderChange(field, event)} />
+        </div>
+        <div class="slider-container">
+          <input
+            type="range"
+            min={min}
+            max={max}
+            value={this[field]}
+            onInput={(event: Event) => this.handleSliderChange(field, event)}
+            style={{ '--slider-fill': `${((this[field] - min) / (max - min)) * 100}%` }}
+          />
+          <div class="slider-labels">
+            <span>{min}</span>
+            <span>{max}</span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -47,110 +89,73 @@ export class RoiCalculator {
     const { totalSavings, hoursSavedPerYear, askTimmyCost, roi } = this.calculateSavings();
 
     return (
-      <div>
+      <div class="roi-calculator-wrapper">
+        {/* <div class="calculator-header"></div> */}
+
         <div class="calculator-container">
-          <div class="controls-section">
-            <div class="control-group">
-              <label>What is the cost per hour per agent? (in US$)</label>
-              <div class="slider-container">
-                <div class="slider-wrapper">
-                  <input
-                    type="range"
-                    min={1}
-                    max={200}
-                    value={this.costPerHour}
-                    onInput={event => this.handleSliderChange('costPerHour', event)}
-                    style={{ '--value': `${((this.costPerHour - 1) / (200 - 1)) * 100}%` }}
-                  />
-                  {this.renderSliderMarks(1, 200)}
-                </div>
-                <input type="number" min={1} max={200} value={this.costPerHour} onInput={event => this.handleSliderChange('costPerHour', event)} />
-              </div>
-            </div>
+          <div class="inputs-section">
+            {this.renderInputField('What is the cost per hour per agent? (in US$)', 'costPerHour', 1, 200, 'dollar-icon')}
 
-            <div class="control-group">
-              <label>How many tickets do you get each month?</label>
-              <div class="slider-container">
-                <div class="slider-wrapper">
-                  <input
-                    type="range"
-                    min={1}
-                    max={2000}
-                    value={this.ticketsPerMonth}
-                    onInput={event => this.handleSliderChange('ticketsPerMonth', event)}
-                    style={{ '--value': `${((this.ticketsPerMonth - 1) / (2000 - 1)) * 100}%` }}
-                  />
-                  {this.renderSliderMarks(1, 2000)}
-                </div>
-                <input type="number" min={1} max={2000} value={this.ticketsPerMonth} onInput={event => this.handleSliderChange('ticketsPerMonth', event)} />
-              </div>
-            </div>
+            {this.renderInputField('How many tickets do you get each month?', 'ticketsPerMonth', 1, 2000, 'ticket-icon')}
 
-            <div class="control-group">
-              <label>Time it takes to resolve each ticket (in mins)</label>
-              <div class="slider-container">
-                <div class="slider-wrapper">
-                  <input
-                    type="range"
-                    min={1}
-                    max={200}
-                    value={this.timePerTicket}
-                    onInput={event => this.handleSliderChange('timePerTicket', event)}
-                    style={{ '--value': `${((this.timePerTicket - 1) / (200 - 1)) * 100}%` }}
-                  />
-                  {this.renderSliderMarks(1, 200)}
-                </div>
-                <input type="number" min={1} max={200} value={this.timePerTicket} onInput={event => this.handleSliderChange('timePerTicket', event)} />
-              </div>
-            </div>
+            {this.renderInputField('Time it takes to resolve each ticket (in mins)', 'timePerTicket', 1, 200, 'clock-icon')}
 
-            <div class="control-group">
-              <label>% of tickets you want AI to resolve automatically</label>
-              <div class="slider-container">
-                <div class="slider-wrapper">
-                  <input
-                    type="range"
-                    min={1}
-                    max={100}
-                    value={this.aiResolutionRate}
-                    onInput={event => this.handleSliderChange('aiResolutionRate', event)}
-                    style={{ '--value': `${((this.aiResolutionRate - 1) / (100 - 1)) * 100}%` }}
-                  />
-                  {this.renderSliderMarks(1, 100)}
-                </div>
-                <input type="number" min={1} max={100} value={this.aiResolutionRate} onInput={event => this.handleSliderChange('aiResolutionRate', event)} />
-              </div>
-            </div>
+            {this.renderInputField('% of tickets you want AI to resolve automatically', 'aiResolutionRate', 1, 100, 'robot-icon')}
           </div>
 
           <div class="results-section">
             <div class="results-container">
               <div class="result-item">
-                <div class="result-label">Total Savings</div>
-                <div class="result-value">${totalSavings.toLocaleString(undefined, { maximumFractionDigits: 0 })}/yr</div>
+                <div class="result-icon conversations-icon"></div>
+                <div class="result-content">
+                  <div class="result-label">Total Conversations :</div>
+                  <div class="result-value">{this.ticketsPerMonth * 12}/yr</div>
+                </div>
               </div>
 
               <div class="result-item">
-                <div class="result-label">Hours Saved</div>
-                <div class="result-value">{hoursSavedPerYear.toLocaleString(undefined, { maximumFractionDigits: 0 })} hrs/yr</div>
+                <div class="result-icon clock-icon"></div>
+                <div class="result-content">
+                  <div class="result-label">Hours Saved:</div>
+                  <div class="result-value">{hoursSavedPerYear.toLocaleString(undefined, { maximumFractionDigits: 0 })} hrs/yr</div>
+                </div>
               </div>
 
               <div class="result-item">
-                <div class="result-label">AskTimmy Cost</div>
-                <div class="result-value">${askTimmyCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}/yr</div>
+                <div class="result-icon aov-icon"></div>
+                <div class="result-content">
+                  <div class="result-label">Total Savings:</div>
+                  <div class="result-value">${totalSavings.toLocaleString(undefined, { maximumFractionDigits: 0 })}/yr</div>
+                </div>
               </div>
 
-              <div class="result-item highlight">
-                <div class="result-label">Annual ROI</div>
-                <div class="roi-value">{roi.toLocaleString(undefined, { maximumFractionDigits: 0 })}%</div>
+              <div class="result-item">
+                <div class="result-icon asktimmy-icon"></div>
+                <div class="result-content">
+                  <div class="result-label">AskTimmy Cost:</div>
+                  <div class="result-value">${askTimmyCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}/yr</div>
+                </div>
               </div>
 
-              <div class="cta-container">
-                <a href="https://apps.shopify.com/asktimmy-ai" class="cta-button" target="_blank" rel="noopener">
-                  Try AskTimmy
-                </a>
-              </div>
+              {/* <div class="result-item">
+                <div class="result-icon subscription-icon"></div>
+                <div class="result-content">
+                  <div class="result-label">Annual ROI:</div>
+                  <div class="result-value">{roi.toLocaleString(undefined, { maximumFractionDigits: 0 })}%</div>
+                </div>
+              </div> */}
             </div>
+
+            <div class="roi-highlight">
+              <div class="roi-title">Annual ROI:</div>
+              <div class="roi-value">{roi.toLocaleString(undefined, { maximumFractionDigits: 0 })}%</div>
+            </div>
+            {/* 
+            <div class="cta-container">
+              <a href="https://apps.shopify.com/asktimmy-ai" class="cta-button" target="_blank" rel="noopener">
+                Try AskTimmy
+              </a>
+            </div> */}
           </div>
         </div>
       </div>
