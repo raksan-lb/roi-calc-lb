@@ -12,7 +12,7 @@ export class RoiCalculator {
   @State() aiResolutionRate: number = 50;
 
   calculateSavings() {
-    const askTimmyCost = 588;
+    const askTimmyCost = 948;
 
     const hoursSavedPerMonth = this.ticketsPerMonth * (this.timePerTicket / 60) * (this.aiResolutionRate / 100);
     const hoursSavedPerYear = hoursSavedPerMonth * 12;

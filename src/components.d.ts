@@ -8,6 +8,8 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface RoiCalculator {
     }
+    interface RoiCalculator2 {
+    }
 }
 declare global {
     interface HTMLRoiCalculatorElement extends Components.RoiCalculator, HTMLStencilElement {
@@ -16,15 +18,25 @@ declare global {
         prototype: HTMLRoiCalculatorElement;
         new (): HTMLRoiCalculatorElement;
     };
+    interface HTMLRoiCalculator2Element extends Components.RoiCalculator2, HTMLStencilElement {
+    }
+    var HTMLRoiCalculator2Element: {
+        prototype: HTMLRoiCalculator2Element;
+        new (): HTMLRoiCalculator2Element;
+    };
     interface HTMLElementTagNameMap {
         "roi-calculator": HTMLRoiCalculatorElement;
+        "roi-calculator2": HTMLRoiCalculator2Element;
     }
 }
 declare namespace LocalJSX {
     interface RoiCalculator {
     }
+    interface RoiCalculator2 {
+    }
     interface IntrinsicElements {
         "roi-calculator": RoiCalculator;
+        "roi-calculator2": RoiCalculator2;
     }
 }
 export { LocalJSX as JSX };
@@ -32,6 +44,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "roi-calculator": LocalJSX.RoiCalculator & JSXBase.HTMLAttributes<HTMLRoiCalculatorElement>;
+            "roi-calculator2": LocalJSX.RoiCalculator2 & JSXBase.HTMLAttributes<HTMLRoiCalculator2Element>;
         }
     }
 }
